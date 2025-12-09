@@ -1,8 +1,8 @@
-// app/(protectec)/agent/page.tsx (o donde tengas AgentPage)
+// app/(protectec)/agent/page.tsx
 
 import { auth } from "@/src/auth"
+import AgentDashboard from "@/src/components/AgentDashboard";
 import { db } from "@/src/lib/db"
-import LogoutButton from "@/src/components/ui/LogoutButton"
 
 const AgentPage = async () => {
     const session = await auth()
@@ -12,31 +12,31 @@ const AgentPage = async () => {
         return <div>You are not agent</div>
     }
 
-    // obtener todos los tickets (luego agregamos filtros)
+    // get all tickets (later we can add filters)
     const tickets = await db.ticket.findMany({
         orderBy: { createdAt: "desc" },
+        include: {
+            createdBy: {
+                select: { name: true, email: true }
+            },
+            assignedTo: {
+                select: { id: true, name: true, email: true }
+            }
+        }
+    })
+
+    // get list of agents to assign
+    const agents = await db.user.findMany({
+        where: { role: "agent" },
+        select: { id: true, name: true, email: true }
     })
 
     return (
-        <div>
-            <h1>Agent dashboard</h1>
-
-            {/* mostrar la sesión completa */}
-            <pre>
-                {
-                    JSON.stringify(session, null, 2)
-                }
-            </pre>
-
-            {/* mostrar todos los tickets para el agente */}
-            <pre>
-                {
-                    JSON.stringify(tickets, null, 2)
-                }
-            </pre>
-
-            <LogoutButton />
-        </div>
+        <AgentDashboard
+            agentName={session.user.name || session.user.email}
+            tickets={tickets}
+            agents={agents}
+        />
     )
 }
 

@@ -5,24 +5,26 @@ import ClientDashboard from "@/src/components/ClientDashboard"
 import { db } from "@/src/lib/db"
 
 const ClientPage = async () => {
-    // obtener la sesión del usuario autenticado
+    // get the authenticated user session
     const session = await auth()
     if (!session) {
-        return <div>Not autenticado</div>
+        return <div>Not authenticated</div>
     }
 
-    // obtener los tickets creados por este cliente
+    // get tickets created by this client
     const tickets = await db.ticket.findMany({
-        where: { createdById: session.user.id }, // solo sus tickets
+        where: { createdById: session.user.id }, // only their own tickets
         orderBy: { createdAt: "desc" },
     })
 
     return (
-        <ClientDashboard
-            // nombre visible en el header (fallback al email si no hay nombre)
-            userName={session.user.name || session.user.email}
-            tickets={tickets}
-        />
+        <div className="min-h-screen bg-[#10451d]/5">
+            <ClientDashboard
+                // visible name in header (fallback to email if name is not defined)
+                userName={session.user.name || session.user.email}
+                tickets={tickets}
+            />
+        </div>
     )
 }
 

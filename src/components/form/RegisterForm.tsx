@@ -1,3 +1,4 @@
+// src/components/form/RegisterForm.tsx
 'use client'
 import { useForm } from "react-hook-form"
 import { RegisterInSchema } from "@/src/lib/zod"
@@ -14,15 +15,14 @@ const RegisterForm = () => {
     const [error, setError] = useState<string | null>(null)
     const [isPending, SetIsPending] = useTransition()
 
-
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<z.infer<typeof RegisterInSchema>>({
-        // A. EL CONECTOR CON ZOD
+        // A. CONNECTOR WITH ZOD
         resolver: zodResolver(RegisterInSchema),
-        // B. VALORES INICIALES
+        // B. INITIAL VALUES
         defaultValues: {
             email: "",
             password: "",
@@ -30,7 +30,6 @@ const RegisterForm = () => {
             username: "",
         }
     })
-
 
     async function onSubmit(values: z.infer<typeof RegisterInSchema>) {
         setError(null)
@@ -51,21 +50,19 @@ const RegisterForm = () => {
 
     return (
         <div>
-            <h1>Register</h1>
-
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* name */}
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <label
                         htmlFor="name"
-                        className={`block text-sm font-medium ${errors.email ? "text-red-500" : ""}`}
+                        className={`block text-sm font-medium ${errors.name ? "text-red-500" : "text-[#10451d]"}`}
                     >
                         Your name
                     </label>
                     <div>
                         <Input
                             id="name"
+                            className="w-full border border-[#25a244]/60 rounded-md px-3 py-2 text-sm text-[#10451d] focus:outline-none focus:ring-2 focus:ring-[#25a244]"
                             placeholder="Juanit Perez"
                             {...register("name")}
                         />
@@ -77,32 +74,35 @@ const RegisterForm = () => {
                     )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <label
                         htmlFor="user_name"
+                        className="block text-sm font-medium text-[#10451d]"
                     >
-                        Your user name (opcinal)
+                        Your user name (optional)
                     </label>
                     <div>
                         <Input
-                            id="name"
-                            placeholder="Your nick name"
+                            id="user_name"
+                            className="w-full border border-[#25a244]/60 rounded-md px-3 py-2 text-sm text-[#10451d] focus:outline-none focus:ring-2 focus:ring-[#25a244]"
+                            placeholder="Your nickname"
                             {...register("username")}
                         />
                     </div>
                 </div>
 
                 {/* Email */}
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <label
                         htmlFor="email"
-                        className={`block text-sm font-medium ${errors.email ? "text-red-500" : ""}`}
+                        className={`block text-sm font-medium ${errors.email ? "text-red-500" : "text-[#10451d]"}`}
                     >
                         Email
                     </label>
                     <div>
                         <Input
                             id="email"
+                            className="w-full border border-[#25a244]/60 rounded-md px-3 py-2 text-sm text-[#10451d] focus:outline-none focus:ring-2 focus:ring-[#25a244]"
                             placeholder="@gmail.com"
                             {...register("email")}
                         />
@@ -115,10 +115,10 @@ const RegisterForm = () => {
                 </div>
 
                 {/* Password */}
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <label
                         htmlFor="password"
-                        className={`block text-sm font-medium ${errors.password ? "text-red-500" : ""}`}
+                        className={`block text-sm font-medium ${errors.password ? "text-red-500" : "text-[#10451d]"}`}
                     >
                         Password
                     </label>
@@ -126,6 +126,7 @@ const RegisterForm = () => {
                         <Input
                             id="password"
                             type="password"
+                            className="w-full border border-[#25a244]/60 rounded-md px-3 py-2 text-sm text-[#10451d] focus:outline-none focus:ring-2 focus:ring-[#25a244]"
                             placeholder="*****"
                             {...register("password")}
                         />
@@ -137,18 +138,24 @@ const RegisterForm = () => {
                     )}
                 </div>
 
-                <div>
-                    {
-                        error
-                    }
+                <div className="text-sm text-red-600 min-h-[1.25rem]">
+                    {error}
                 </div>
 
                 <IButton
                     type="submit"
                     disabled={isPending}
+                    className="w-full bg-[#25a244] hover:bg-[#1a7431] text-white font-semibold py-2 rounded-md transition-colors"
                 >
                     Submit
                 </IButton>
+
+                <p className="mt-3 text-xs text-center text-gray-500">
+                    Already have an account?{" "}
+                    <a href="/login" className="text-[#1a7431] font-medium hover:underline">
+                        Login
+                    </a>
+                </p>
             </form>
         </div>
     )

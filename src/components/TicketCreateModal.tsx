@@ -18,27 +18,38 @@ export default function TicketCreateModal({
             {open && (
                 <motion.div
                     // backdrop
-                    className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+                    className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={onClose}
                 >
                     <motion.div
-                        // contenedor modal
-                        className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl"
+                        // modal container
+                        className="w-full max-w-md rounded-2xl bg-[#10451d] text-white shadow-2xl border border-[#25a244]/60"
                         initial={{ y: 40, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 40, opacity: 0 }}
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between mb-3">
-                            <h2 className="text-lg font-semibold">Nuevo ticket</h2>
-                            <button onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700">Cerrar</button>
+                        {/* header */}
+                        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-white/10">
+                            <h2 className="text-lg font-semibold">
+                                New ticket
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                className="text-sm text-white/80 hover:text-white"
+                            >
+                                Close
+                            </button>
                         </div>
 
-                        <TicketCreateForm onSuccess={onCreated} />
+                        {/* body */}
+                        <div className="px-5 pb-5 pt-3 bg-[#1a7431]/20 rounded-b-2xl">
+                            <TicketCreateForm onSuccess={onCreated} />
+                        </div>
                     </motion.div>
                 </motion.div>
             )}
