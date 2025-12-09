@@ -4,12 +4,15 @@ import { NextResponse } from "next/server"
 import { auth } from "@/src/auth"
 import { db } from "@/src/lib/db"
 
-type Params = { params: { id: string } }
+type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_req: Request, { params }: Params) {
     try {
+        const { id } = await params
+        console.log("[TICKET_GET] Fetching ticket id:", id)
+
         const ticket = await db.ticket.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 createdBy: { select: { id: true, name: true, email: true } },
                 assignedTo: { select: { id: true, name: true, email: true } },
@@ -33,6 +36,9 @@ export async function GET(_req: Request, { params }: Params) {
 
 export async function PATCH(req: Request, { params }: Params) {
     try {
+        const { id } = await params
+        console.log("[TICKET_PATCH] Attempting update for id:", id)
+
         const session = await auth()
         if (!session || !session.user) {
             return new NextResponse("Unauthorized", { status: 401 })
@@ -68,7 +74,7 @@ export async function PATCH(req: Request, { params }: Params) {
         }
 
         const updated = await db.ticket.update({
-            where: { id: params.id },
+            where: { id },
             data,
         })
 

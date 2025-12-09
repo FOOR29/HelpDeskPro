@@ -43,6 +43,7 @@ export default function AgentDashboard({
         setError(null)
         startTransition(async () => {
             try {
+                console.log(`[Dashboard] Updating ticket: ${ticketId}, URL: /api/tickets/${ticketId}`);
                 const res = await fetch(`/api/tickets/${ticketId}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
