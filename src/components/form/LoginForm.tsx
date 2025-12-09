@@ -10,7 +10,6 @@ import { startTransition, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { loginAction } from "@/src/actions/auth-actions"
 
-//lo que esta dentro del login form () es para verificar el email, se puede eliminar si este no es el caso
 const LoginForm = () => {
     const router = useRouter(); //use router para mandar al dashboard
     const [error, setError] = useState<string | null>(null)
@@ -19,29 +18,32 @@ const LoginForm = () => {
 
     const {
         register,
-        handleSubmit, // Es el "portero" del formulario. Se pone en el <form onSubmit={...}>.
-        formState: { errors }, // Es el "mensajero". Aquí viven los errores en tiempo real. // Si Zod dice que el email está mal, 'errors.email' tendrá el mensaje // Si todo está bien, 'errors' estará vacío.
-    } = useForm<z.infer<typeof LoginInSchema>>({ // 2. CONFIGURACIÓN DEL HOOK
-        // A. EL CONECTOR CON ZOD
-        resolver: zodResolver(LoginInSchema), // Esto es lo más importante. Le dice a React Hook Form: // "No uses validación HTML normal. Cada vez que alguien escriba o intente enviar, // pregúntale a 'LoginInSchema' (tu archivo zod.ts) si los datos son correctos".
-        // B. VALORES INICIALES
+        handleSubmit,
+        formState: { errors },
+        // ZOD INTEGRATION
+    } = useForm<z.infer<typeof LoginInSchema>>({
+        resolver: zodResolver(LoginInSchema),
         defaultValues: {
-            email: "",      // El formulario arranca limpio.
-            password: ""    // Si no pones esto, React puede quejarse de que los inputs cambian de "uncontrolled" a "controlled".
+            email: "",
+            password: ""
         }
     })
 
 
-    // con este onsubmit se pide los valores que son email y password en este caso
     async function onSubmit(values: z.infer<typeof LoginInSchema>) {
         setError(null)
         startTransition(async () => {
             const response = await loginAction(values)
-            console.log(response); // con esto mostramos en la terminal cuando el usuario sus credenciales son incorrectas
+            console.log(response);
             if (response.error) {
                 setError(response.error)
             } else {
-                router.push("/dashboard")
+                // redirigir según el rol del usuario
+                if (response.role === "agent") {
+                    router.push("/agent")
+                } else {
+                    router.push("/dashboard")
+                }
             }
         })
     }
@@ -50,7 +52,7 @@ const LoginForm = () => {
         <div>
             <h1>Login</h1>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                {/* Campo Email */}
+                {/* Email */}
                 <div className="space-y-2">
                     <label
                         htmlFor="email"
@@ -62,10 +64,10 @@ const LoginForm = () => {
                         <Input
                             id="email"
                             placeholder="@gmail.com"
-                            {...register("email")} // Aquí conectamos directamente con hook form
+                            {...register("email")}
                         />
                     </div>
-                    {/* Mensaje de error manual */}
+                    {/* Mesagge de error */}
                     {errors.email && (
                         <p className="text-sm font-medium text-red-500">
                             {errors.email.message}
@@ -73,7 +75,7 @@ const LoginForm = () => {
                     )}
                 </div>
 
-                {/* Campo Password */}
+                {/* Password */}
                 <div className="space-y-2">
                     <label
                         htmlFor="password"
@@ -86,10 +88,9 @@ const LoginForm = () => {
                             id="password"
                             type="password"
                             placeholder="*****"
-                            {...register("password")} // Aquí conectamos directamente con hook form
+                            {...register("password")}
                         />
                     </div>
-                    {/* Mensaje de error manual */}
                     {errors.password && (
                         <p className="text-sm font-medium text-red-500">
                             {errors.password.message}

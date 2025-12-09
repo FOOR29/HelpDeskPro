@@ -1,8 +1,7 @@
 'use client'
 import { useForm } from "react-hook-form"
 import { RegisterInSchema } from "@/src/lib/zod"
-import { zodResolver } from "@hookform/resolvers/zod" // se debe nstalar esto como: npm i @hookform/resolvers
-// Ese resolver es de @hookform/resolvers, que es el paquete que conecta Zod con react-hook-form.
+import { zodResolver } from "@hookform/resolvers/zod"
 import z from "zod"
 import { startTransition, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
@@ -11,38 +10,41 @@ import Input from "../ui/Input"
 import IButton from "../ui/IButton" 
 
 const RegisterForm = () => {
-    const router = useRouter(); //use router para mandar al dashboard
+    const router = useRouter();
     const [error, setError] = useState<string | null>(null)
     const [isPending, SetIsPending] = useTransition()
 
 
     const {
         register,
-        handleSubmit, // Es el "portero" del formulario. Se pone en el <form onSubmit={...}>.
-        formState: { errors }, // Es el "mensajero". Aquí viven los errores en tiempo real. // Si Zod dice que el email está mal, 'errors.email' tendrá el mensaje // Si todo está bien, 'errors' estará vacío.
-    } = useForm<z.infer<typeof RegisterInSchema>>({ // 2. CONFIGURACIÓN DEL HOOK
+        handleSubmit,
+        formState: { errors },
+    } = useForm<z.infer<typeof RegisterInSchema>>({
         // A. EL CONECTOR CON ZOD
-        resolver: zodResolver(RegisterInSchema), // Esto es lo más importante. Le dice a React Hook Form: // "No uses validación HTML normal. Cada vez que alguien escriba o intente enviar, // pregúntale a 'LoginInSchema' (tu archivo zod.ts) si los datos son correctos".
+        resolver: zodResolver(RegisterInSchema),
         // B. VALORES INICIALES
         defaultValues: {
-            email: "",      // El formulario arranca limpio.
-            password: "",    // Si no pones esto, React puede quejarse de que los inputs cambian de "uncontrolled" a "controlled".
+            email: "",
+            password: "",
             name: "",
-            username: "", // esto es opcional
+            username: "",
         }
     })
 
 
-    // con este onsubmit se pide los valores que son email y password en este caso
     async function onSubmit(values: z.infer<typeof RegisterInSchema>) {
         setError(null)
         startTransition(async () => {
             const response = await registerAction(values)
-            console.log(response); // con esto mostramos en la terminal cuando el usuario sus credenciales son incorrectas
+            console.log(response);
             if (response.error) {
                 setError(response.error)
             } else {
-                router.push("/dashboard")
+                if (response.role === "agent") {
+                    router.push("/agent")
+                } else {
+                    router.push("/dashboard")
+                }
             }
         })
     }
@@ -53,7 +55,7 @@ const RegisterForm = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
-                {/* Campo name */}
+                {/* name */}
                 <div className="space-y-2">
                     <label
                         htmlFor="name"
@@ -65,10 +67,9 @@ const RegisterForm = () => {
                         <Input
                             id="name"
                             placeholder="Juanit Perez"
-                            {...register("name")} // Aquí conectamos directamente con hook form
+                            {...register("name")}
                         />
                     </div>
-                    {/* Mensaje de error manual */}
                     {errors.name && (
                         <p className="text-sm font-medium text-red-500">
                             {errors.name.message}
@@ -76,7 +77,6 @@ const RegisterForm = () => {
                     )}
                 </div>
 
-                {/* Campo User name opcinal esto se puede eliminar */}
                 <div className="space-y-2">
                     <label
                         htmlFor="user_name"
@@ -87,12 +87,12 @@ const RegisterForm = () => {
                         <Input
                             id="name"
                             placeholder="Your nick name"
-                            {...register("username")} // Aquí conectamos directamente con hook form
+                            {...register("username")}
                         />
                     </div>
                 </div>
 
-                {/* Campo Email */}
+                {/* Email */}
                 <div className="space-y-2">
                     <label
                         htmlFor="email"
@@ -104,10 +104,9 @@ const RegisterForm = () => {
                         <Input
                             id="email"
                             placeholder="@gmail.com"
-                            {...register("email")} // Aquí conectamos directamente con hook form
+                            {...register("email")}
                         />
                     </div>
-                    {/* Mensaje de error manual */}
                     {errors.email && (
                         <p className="text-sm font-medium text-red-500">
                             {errors.email.message}
@@ -115,7 +114,7 @@ const RegisterForm = () => {
                     )}
                 </div>
 
-                {/* Campo Password */}
+                {/* Password */}
                 <div className="space-y-2">
                     <label
                         htmlFor="password"
@@ -128,10 +127,9 @@ const RegisterForm = () => {
                             id="password"
                             type="password"
                             placeholder="*****"
-                            {...register("password")} // Aquí conectamos directamente con hook form
+                            {...register("password")}
                         />
                     </div>
-                    {/* Mensaje de error manual */}
                     {errors.password && (
                         <p className="text-sm font-medium text-red-500">
                             {errors.password.message}

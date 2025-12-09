@@ -1,3 +1,5 @@
+// src/actions/auth-actions.ts
+
 "use server"
 // esto se encarga de poder poder ejecutar el SigIn
 
@@ -5,9 +7,8 @@ import z, { success } from "zod";
 import { LoginInSchema, RegisterInSchema } from "../lib/zod";
 import { AuthError } from "next-auth";
 import { db } from "../lib/db";
-import bcrypt from "bcryptjs";  // se debe instalar como "npm i bcryptjs"
+import bcrypt from "bcryptjs";
 import { signIn } from "../auth";
-
 
 export const loginAction = async (values: z.infer<typeof LoginInSchema>) => {
     try {
@@ -16,7 +17,13 @@ export const loginAction = async (values: z.infer<typeof LoginInSchema>) => {
             password: values.password,
             redirect: false,
         })
-        return { success: true }
+
+        // buscar el usuario para saber su rol
+        const user = await db.user.findUnique({
+            where: { email: values.email },
+        })
+
+        return { success: true, role: user?.role }
     } catch (error) {
         if (error instanceof AuthError) {
             return { error: error.cause?.err?.message }
@@ -49,12 +56,13 @@ export const registerAction = async (values: z.infer<typeof RegisterInSchema>) =
         const passwordHash = await bcrypt.hash(data.password, 10)
 
         // una ves haseada se crea el usuario
-        await db.user.create({
+        const newUser = await db.user.create({
             data: {
                 email: data.email,
                 name: data.name,
                 username: data.username,
                 password: passwordHash,
+                // el rol queda por defecto en client
             }
         })
         // credenciales necesarias para ingresar
@@ -64,7 +72,7 @@ export const registerAction = async (values: z.infer<typeof RegisterInSchema>) =
             redirect: false,
         })
 
-        return { success: true }
+        return { success: true, role: newUser.role }
     } catch (error) {
         if (error instanceof AuthError) {
             return { error: error.cause?.err?.message }

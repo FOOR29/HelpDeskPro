@@ -2,34 +2,42 @@ import NextAuth from "next-auth"
 import authConfig from "@/auth.config"
 import { NextResponse } from "next/server"
 
-
-// esto te redireciona al login si intentas entrar al dashboard con /dashboard
 const { auth: middleware } = NextAuth(authConfig)
 
-// un arrays con las rutas publicas
-const publicRoutes = [
-    "/",
-    "/login",
-    "/register",
-    // "/eror" esta es opcional
-]
+const publicRoutes = ["/", "/login", "/register"]
 
 export default middleware((req) => {
     const { nextUrl, auth } = req
     const isLoggedIn = !!auth?.user
+    const pathname = nextUrl.pathname
+    const role = auth?.user?.role as "client" | "agent" | undefined
 
-    // peoteger las rutas
-    if (!publicRoutes.includes(nextUrl.pathname) && !isLoggedIn) {
-        return NextResponse.redirect(new URL("login", nextUrl))
+    // Si no está logueado y ruta no es pública → a /login
+    if (!publicRoutes.includes(pathname) && !isLoggedIn) {
+        return NextResponse.redirect(new URL("/login", nextUrl))
     }
 
-    return NextResponse.next();
+    // Si está logueado y entra a /login o /register → redirigir según rol
+    if (isLoggedIn && (pathname === "/login" || pathname === "/register")) {
+        if (role === "agent") {
+            return NextResponse.redirect(new URL("/agent", nextUrl))
+        }
+        return NextResponse.redirect(new URL("/dashboard", nextUrl))
+    }
+
+    // Proteger ruta /agent: solo agentes
+    if (pathname.startsWith("/agent") && role !== "agent") {
+        return NextResponse.redirect(new URL("/dashboard", nextUrl))
+    }
+
+    // Proteger ruta /dashboard: solo clientes
+    if (pathname.startsWith("/dashboard") && role !== "client") {
+        return NextResponse.redirect(new URL("/agent", nextUrl))
+    }
+
+    return NextResponse.next()
 })
 
-//  Mantenemos la configuración de las rutas (Matcher)
 export const config = {
-    matcher: [
-        // Excluir archivos internos de Next.js y estáticos
-        "/((?!api|_next/static|_next/image|favicon.ico).*)",
-    ],
-};
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+}

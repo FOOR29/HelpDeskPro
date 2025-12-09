@@ -1,5 +1,5 @@
 "use client"
-import { signOut } from 'next-auth/react'  // se debe instalar next-auth como "npm install next-auth"
+import { signOut } from 'next-auth/react'
 import IButton from './IButton'
 
 const LogoutButton = () => {

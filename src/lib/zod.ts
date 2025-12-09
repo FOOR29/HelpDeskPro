@@ -1,8 +1,6 @@
 import z from "zod";
 
-
-// asi se valida con zod ahora con la ultima version
-// validacion de login
+// validatio of login
 export const LoginInSchema = z.object({
     email: z
         .string()
@@ -15,7 +13,7 @@ export const LoginInSchema = z.object({
         .max(32, "Password must be less than 32 characters"),
 });
 
-// validacion para el register
+// validation of register
 export const RegisterInSchema = z.object({
     email: z
         .string()
