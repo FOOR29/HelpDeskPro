@@ -40,7 +40,6 @@ export async function PATCH(req: Request, { params }: Params) {
 
         const role = session.user.role as "client" | "agent"
         if (role !== "agent") {
-            // solo agentes pueden cambiar estado/prioridad/asignación
             return new NextResponse("Forbidden", { status: 403 })
         }
 
@@ -51,7 +50,6 @@ export async function PATCH(req: Request, { params }: Params) {
             assignedToId?: string | null
         }
 
-        // opcional: validar que el agente asignado exista y sea agent
         let data: any = {}
         if (status) data.status = status
         if (priority) data.priority = priority

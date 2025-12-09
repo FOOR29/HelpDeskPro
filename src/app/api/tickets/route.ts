@@ -23,7 +23,6 @@ export async function GET() {
                 orderBy: { createdAt: "desc" },
             })
         } else {
-            // agente: todos los tickets
             tickets = await db.ticket.findMany({
                 orderBy: { createdAt: "desc" },
             })
@@ -62,7 +61,6 @@ export async function POST(req: Request) {
             data: {
                 title,
                 description,
-                // si no mandas priority desde el front, Prisma usará el default MEDIUM
                 priority: priority ?? "MEDIUM",
                 createdById: id,
             },

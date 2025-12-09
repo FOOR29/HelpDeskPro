@@ -20,7 +20,6 @@ const ClientPage = async () => {
     return (
         <div className="min-h-screen bg-[#10451d]/5">
             <ClientDashboard
-                // visible name in header (fallback to email if name is not defined)
                 userName={session.user.name || session.user.email}
                 tickets={tickets}
             />
