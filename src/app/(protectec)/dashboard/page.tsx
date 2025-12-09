@@ -1,13 +1,12 @@
-// app/(protectec)/dashboard/page.tsx (o donde tengas ClientPage)
+// app/(protectec)/dashboard/page.tsx
 
 import { auth } from "@/src/auth"
+import ClientDashboard from "@/src/components/ClientDashboard"
 import { db } from "@/src/lib/db"
-import LogoutButton from "@/src/components/ui/LogoutButton"
 
 const ClientPage = async () => {
     // obtener la sesión del usuario autenticado
     const session = await auth()
-
     if (!session) {
         return <div>Not autenticado</div>
     }
@@ -19,25 +18,11 @@ const ClientPage = async () => {
     })
 
     return (
-        <div>
-            <h1>Client dashboard</h1>
-
-            {/* mostrar la sesión completa */}
-            <pre>
-                {
-                    JSON.stringify(session, null, 2)
-                }
-            </pre>
-
-            {/* por ahora mostramos los tickets en bruto para probar */}
-            <pre>
-                {
-                    JSON.stringify(tickets, null, 2)
-                }
-            </pre>
-
-            <LogoutButton />
-        </div>
+        <ClientDashboard
+            // nombre visible en el header (fallback al email si no hay nombre)
+            userName={session.user.name || session.user.email}
+            tickets={tickets}
+        />
     )
 }
 

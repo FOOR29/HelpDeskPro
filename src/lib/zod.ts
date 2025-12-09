@@ -32,3 +32,16 @@ export const RegisterInSchema = z.object({
         .string()
         .max(20, "name must be less than 20 characters")
 });
+
+// validation of ticket create
+export const TicketCreateSchema = z.object({
+    title: z
+        .string()
+        .min(1, "Title is required")
+        .max(100, "Title must be less than 100 characters"),
+    description: z
+        .string()
+        .min(1, "Description is required"),
+    priority: z.enum(["LOW", "MEDIUM", "HIGH"]).default("MEDIUM"),
+})
+
